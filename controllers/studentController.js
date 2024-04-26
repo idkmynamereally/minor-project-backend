@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Student = require("../models/studentModel");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const getStudents = asyncHandler(async (req, res) => {
     const students = await Student.find();
@@ -18,19 +19,11 @@ const getStudent = asyncHandler(async (req, res) => {
 });
 
 const registerStudent = asyncHandler(async (req, res) => {
-    console.log(req.body);
     const { name, email, sap_id, password } = req.body;
     if (!name || !email || !sap_id || !password) {
         res.status(400);
         throw new Error("All fields are mandatory");
     }
-
-    /*    const studentExist = await Student.findOne({ sap_id });
-        if (studentExist) {
-            res.status(400);
-            throw new Error("sap_id already exists");
-        }
-    */
 
     studentExist = await Student.findOne({ email });
     if (studentExist) {
@@ -57,18 +50,16 @@ const registerStudent = asyncHandler(async (req, res) => {
 
 const loginStudent = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-    console.log(1);
     if (!email || !password) {
         res.status(400);
         throw new Error("All fields are mandatory");
     }
-    console.log(1);
 
     const student = await Student.findOne({ email });
     if (student && (await bcrypt.compare(password, student.password))) {
         const accessToken = jwt.sign(
             { user: { sap_id: student.sap_id, email: student.email } },
-            process.env.ACCESS_TOKEN_SECRET,
+            process.env.ACCESS_SECRET_TOKEN,
             { expiresIn: "100m" }
         );
         res.status(200).json({ accessToken });
@@ -77,4 +68,11 @@ const loginStudent = asyncHandler(async (req, res) => {
         throw new Error("No such student exists");
     }
 });
-module.exports = { getStudents, getStudent, registerStudent, loginStudent };
+
+const currentStudent = asyncHandler(async (req, res) => {
+    const email = req.user.email;
+    const student = await Student.findOne({ email });
+    res.status(200).json({ student });
+});
+
+module.exports = { getStudents, getStudent, registerStudent, loginStudent, currentStudent };
