@@ -12,7 +12,6 @@ const validateToken = asyncHandler(async (req, res, next) => {
                 res.status(401);
                 throw new Error("Unable to verify the token");
             }
-
             req.user = decoded.user;
             next();
         });

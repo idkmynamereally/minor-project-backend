@@ -1,7 +1,8 @@
 const asyncHandler = require("express-async-handler");
-const Teacher = require("../models/teacherModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const Teacher = require("../models/teacherModel");
+const Project = require("../models/projectModel");
 
 const getTeachers = asyncHandler(async (req, res) => {
     const teachers = await Teacher.find();
@@ -61,7 +62,8 @@ const loginTeacher = asyncHandler(async (req, res) => {
             user: {
                 name: teacher.name,
                 sap_id: teacher.sap_id,
-                email: teacher.email
+                email: teacher.email,
+                id: teacher.id
             }
         }, process.env.ACCESS_SECRET_TOKEN, { expiresIn: "100m" });
         res.status(200).json({ accessToken });
@@ -71,10 +73,24 @@ const loginTeacher = asyncHandler(async (req, res) => {
     }
 });
 
+const getMentorProjects = asyncHandler(async (req, res) => {
+    const teacherId = req.user.id;
+    const teacher = await Teacher.findById(teacherId);
+    if (!teacher) {
+        res.status(400);
+        throw new Error("Teacher does not exist");
+    }
+    const projects = await Project.find({ mentors: { $in: [teacherId] } })
+        .populate('members mentors coordinators evaluators')
+        .exec();
+    res.status(200);
+    res.json({ projects });
+});
+
 const currentTeacher = asyncHandler(async (req, res) => {
     const email = req.user.email;
     const teacher = await Teacher.findOne({ email });
     res.status(200).json({ name: teacher.name, email: teacher.email, sap_id: teacher.sap_id });
 });
 
-module.exports = { getTeachers, getTeacher, registerTeacher, loginTeacher, currentTeacher };
+module.exports = { getTeachers, getTeacher, registerTeacher, loginTeacher, currentTeacher, getMentorProjects };

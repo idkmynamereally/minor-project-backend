@@ -11,6 +11,7 @@ app.use(errorHandler);
 app.use(express.json());
 app.use("/api/students", require("./routes/studentRoutes"));
 app.use("/api/teachers", require("./routes/teacherRoutes"));
+app.use("/api/projects", require("./routes/projectRoutes"));
 
 app.listen(port, () => {
     console.log(`LISTENING ON PORT ${port}`);

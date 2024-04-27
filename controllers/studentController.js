@@ -37,7 +37,7 @@ const registerStudent = asyncHandler(async (req, res) => {
         name,
         email,
         sap_id,
-        password: hashedPassword
+        password: hashedPassword,
     });
 
     if (student) {
@@ -58,9 +58,17 @@ const loginStudent = asyncHandler(async (req, res) => {
     const student = await Student.findOne({ email });
     if (student && (await bcrypt.compare(password, student.password))) {
         const accessToken = jwt.sign(
-            { user: { sap_id: student.sap_id, email: student.email } },
+            {
+                user: {
+                    sap_id: student.sap_id,
+                    email: student.email,
+                    id: student.id
+                }
+            },
             process.env.ACCESS_SECRET_TOKEN,
-            { expiresIn: "100m" }
+            {
+                expiresIn: "100m"
+            }
         );
         res.status(200).json({ accessToken });
     } else {
