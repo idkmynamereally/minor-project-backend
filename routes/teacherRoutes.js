@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
+const cors = require("cors");
 const { getTeachers, getTeacher, registerTeacher, loginTeacher, currentTeacher, getMentorProjects } = require("../controllers/teacherController");
 const validateToken = require("../controllers/middleware/validateTokenHandler");
 
 router.post("/register", registerTeacher).post("/login", loginTeacher);
-router.get("/current", validateToken, currentTeacher);
-router.get("/getMentorProjects", validateToken, getMentorProjects);
-router.get("/", validateToken, getTeachers).get("/:id", validateToken, getTeacher);
+router.get("/current", currentTeacher);
+router.get("/getMentorProjects", getMentorProjects);
+router.get("/", getTeachers).get("/:id", getTeacher);
 
 module.exports = router;

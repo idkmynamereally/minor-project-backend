@@ -4,6 +4,6 @@ const validateToken = require("../controllers/middleware/validateTokenHandler");
 const { getProjects, getProject, createProject } = require("../controllers/projectController");
 
 router.get("/", getProjects).get("/:id", getProject);
-router.post("/create", validateToken, createProject);
+router.post("/create", createProject);
 
 module.exports = router;

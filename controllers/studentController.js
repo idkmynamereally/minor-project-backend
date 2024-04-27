@@ -54,8 +54,10 @@ const loginStudent = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("All fields are mandatory");
     }
-
+    console.log(email);
     const student = await Student.findOne({ email });
+    console.log(student);
+    console.log((await bcrypt.compare(password, student.password)));
     if (student && (await bcrypt.compare(password, student.password))) {
         const accessToken = jwt.sign(
             {

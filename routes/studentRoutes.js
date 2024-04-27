@@ -6,6 +6,6 @@ const validateToken = require("../controllers/middleware/validateTokenHandler");
 
 router.post("/register", registerStudent);
 router.post("/login", loginStudent);
-router.get("/", validateToken, getStudents).get("/current", validateToken, currentStudent).get("/:id", validateToken, getStudent);
+router.get("/", getStudents).get("/current", currentStudent).get("/:id", getStudent);
 
 module.exports = router;
